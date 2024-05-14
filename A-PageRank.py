@@ -15,75 +15,75 @@ from sknetwork.clustering import Louvain
 
 def preprocess(road):
 
-	pl = []
+    pl = []
+    
+    for index, row in road.iterrows():
+    
+    if len(row['geometry'].coords) == 2:
+        
+	p1 = Point(row['geometry'].coords[0][0], row['geometry'].coords[0][1])
+        p2 = Point(row['geometry'].coords[-1][0],row['geometry'].coords[-1][1])
+        
+        if p1 not in pl:
+            pl.append(p1)
+            pfi = len(pl) - 1
+	else:
+            pfi = pl.index(p1)
+        
+        if p2 not in pl:
+            pl.append(p2)
+            psi = len(pl) - 1        
+        else:
+            psi = pl.index(p2)
 
-	for index, row in road.iterrows():
+        road.at[index, 'psf'] = str(int(pfi))
+        road.at[index, 'pss'] = str(int(psi))    
+        road.at[index, 'pef'] = str(int(psi))
+        road.at[index, 'pes'] = str(int(pfi))            
+        
+        
+    if len(row['geometry'].coords) > 2:
+        
+    	p1 = Point(row['geometry'].coords[0][0], row['geometry'].coords[0][1])
+        p2 = Point(row['geometry'].coords[1][0], row['geometry'].coords[1][1])
+        p3 = Point(row['geometry'].coords[-2][0],row['geometry'].coords[-2][1])    
+        p4 = Point(row['geometry'].coords[-1][0],row['geometry'].coords[-1][1])    
     
-    	if len(row['geometry'].coords) == 2:
+        if p1 not in pl:
+            pl.append(p1)
+            psfi = len(pl) - 1
+        else:
+            psfi = pl.index(p1)
+        
+        if p2 not in pl:
+            pl.append(p2)
+            pssi = len(pl) - 1        
+        else:
+            pssi = pl.index(p2)    
     
-        	p1 = Point(row['geometry'].coords[0][0], row['geometry'].coords[0][1])
-        	p2 = Point(row['geometry'].coords[-1][0],row['geometry'].coords[-1][1])
+        if p3 not in pl:
+            pl.append(p3)
+            pesi = len(pl) - 1
+        else:
+            pesi = pl.index(p3)
         
-        	if p1 not in pl:
-            	pl.append(p1)
-            	pfi = len(pl) - 1
-        	else:
-            	pfi = pl.index(p1)
-        
-        	if p2 not in pl:
-            	pl.append(p2)
-            	psi = len(pl) - 1        
-        	else:
-            	psi = pl.index(p2)
-
-        	road.at[index, 'psf'] = str(int(pfi))
-        	road.at[index, 'pss'] = str(int(psi))    
-        	road.at[index, 'pef'] = str(int(psi))
-        	road.at[index, 'pes'] = str(int(pfi))            
-        
-        
-	    if len(row['geometry'].coords) > 2:
-        
-    	    p1 = Point(row['geometry'].coords[0][0], row['geometry'].coords[0][1])
-        	p2 = Point(row['geometry'].coords[1][0], row['geometry'].coords[1][1])
-        	p3 = Point(row['geometry'].coords[-2][0],row['geometry'].coords[-2][1])    
-        	p4 = Point(row['geometry'].coords[-1][0],row['geometry'].coords[-1][1])    
+        if p4 not in pl:
+            pl.append(p4)
+            pefi = len(pl) - 1        
+        else:
+            pefi = pl.index(p4)        
     
-        	if p1 not in pl:
-            	pl.append(p1)
-           		psfi = len(pl) - 1
-        	else:
-            	psfi = pl.index(p1)
-        
-        	if p2 not in pl:
-            	pl.append(p2)
-            	pssi = len(pl) - 1        
-        	else:
-            	pssi = pl.index(p2)    
-    
-        	if p3 not in pl:
-            	pl.append(p3)
-            	pesi = len(pl) - 1
-        	else:
-            	pesi = pl.index(p3)
-        
-        	if p4 not in pl:
-            	pl.append(p4)
-            	pefi = len(pl) - 1        
-        	else:
-            	pefi = pl.index(p4)        
-    
-        	road.at[index, 'psf'] = str(int(psfi))
-        	road.at[index, 'pss'] = str(int(pssi))    
-        	road.at[index, 'pef'] = str(int(pefi))
-        	road.at[index, 'pes'] = str(int(pesi))
+        road.at[index, 'psf'] = str(int(psfi))
+        road.at[index, 'pss'] = str(int(pssi))    
+        road.at[index, 'pef'] = str(int(pefi))
+        road.at[index, 'pes'] = str(int(pesi))
 
     df = pd.DataFrame()
-	df['geometry'] = pl
-	df['id'] = [x for x in range(len(df))]
-	points = gpd.GeoDataFrame(df, geometry='geometry', crs='epsg:3857')
-
-	return road, points
+    df['geometry'] = pl
+    df['id'] = [x for x in range(len(df))]
+    points = gpd.GeoDataFrame(df, geometry='geometry', crs='epsg:3857')
+ 
+    return road, points
 
 
 # input：preprocessed road network
@@ -92,41 +92,39 @@ def preprocess(road):
 
 def getPageRankScore(road):
 
-	psf = sorted(list(set(road['psf'])))
-	pef = sorted(list(set(road['pef'])))
-	matrix = np.zeros((len(road), len(road)))
-	matrix = pd.DataFrame(matrix, columns=[x for x in range(len(road))])
-	matrix.index = [x for x in range(len(matrix))]
-	pl = sorted(list(set(list(psf+ pef))))
+    psf = sorted(list(set(road['psf'])))
+    pef = sorted(list(set(road['pef'])))
+    matrix = np.zeros((len(road), len(road)))
+    matrix = pd.DataFrame(matrix, columns=[x for x in range(len(road))])
+    matrix.index = [x for x in range(len(matrix))]
+    pl = sorted(list(set(list(psf+ pef))))
 
-	for p in pl:
+    for p in pl:
         
     	s = road[(road['pef'] == p) | (road['psf'] == p)]
     	if len(s) > 1:
-        	inlist = list(s.index)
-        	for i in range(len(inlist)):
+            inlist = list(s.index)
+            for i in range(len(inlist)):
             	for j in range(i+1, len(inlist)):
                 
-                	interP = list(geo_df['geometry'])[int(p)]
+                    interP = list(geo_df['geometry'])[int(p)]
                 
-                	if s.loc[inlist[i]]['pef'] == p:
+                    if s.loc[inlist[i]]['pef'] == p:
                     	P1 = list(geo_df['geometry'])[int(s.loc[inlist[i]]['pes'])]
-                	else:
+                    else:
                     	P1 = list(geo_df['geometry'])[int(s.loc[inlist[i]]['pss'])]                    
-                    
-                	if s.loc[inlist[j]]['pef'] == p:
+                    if s.loc[inlist[j]]['pef'] == p:
                     	P2 = list(geo_df['geometry'])[int(s.loc[inlist[j]]['pes'])]
-                	else:
+                    else:
                     	P2 = list(geo_df['geometry'])[int(s.loc[inlist[j]]['pss'])]                    
                 
-                	angle =  (azimuth(interP, P1) - azimuth(interP, P2)).round(2)     
-                
-                	if angle >= 0:
+                    angle =  (azimuth(interP, P1) - azimuth(interP, P2)).round(2)     
+                    if angle >= 0:
                     	nangle = np.abs(180 - angle)
-                	else:
+                    else:
                     	nangle = np.abs(180 + angle)
                                     
-	                matrix.at[inlist[i], inlist[j]] = nangle
+	            matrix.at[inlist[i], inlist[j]] = nangle
     	            matrix.at[inlist[j], inlist[i]] = nangle   	
 
     out = PageRank(matrix)
@@ -139,19 +137,19 @@ def getPageRankScore(road):
 
 def getClusters(road, points, matrix):
 
-	louvain = Louvain()
-	labels = louvain.fit_transform(matrix.values)
+    louvain = Louvain()
+    labels = louvain.fit_transform(matrix.values)
 
-	psf = sorted(list(set(road['psf'])))
-	pef = sorted(list(set(road['pef'])))
-	pl = sorted(list(set(list(psf+ pef))))
+    psf = sorted(list(set(road['psf'])))
+    pef = sorted(list(set(road['pef'])))
+    pl = sorted(list(set(list(psf+ pef))))
 
     clusters = pd.DataFrame()
-	clusters['id'] = pl
-	clusters['label'] = label
-	clusters = pd.merge(points, clusters, on=['id'], how='left')
+    clusters['id'] = pl
+    clusters['label'] = label
+    clusters = pd.merge(points, clusters, on=['id'], how='left')
 
-	return clusters
+    return clusters
 
 
 # functions borrows from various resources
@@ -219,6 +217,5 @@ def pageRank(A):
         
     steadyStateVectorOfA = findSteadyState(M, n)
     return steadyStateVectorOfA
-
 
 
