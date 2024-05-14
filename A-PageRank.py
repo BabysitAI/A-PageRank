@@ -19,64 +19,64 @@ def preprocess(road):
     
     for index, row in road.iterrows():
     
-    if len(row['geometry'].coords) == 2:
+	if len(row['geometry'].coords) == 2:
         
-	p1 = Point(row['geometry'].coords[0][0], row['geometry'].coords[0][1])
-        p2 = Point(row['geometry'].coords[-1][0],row['geometry'].coords[-1][1])
+	    p1 = Point(row['geometry'].coords[0][0], row['geometry'].coords[0][1])
+            p2 = Point(row['geometry'].coords[-1][0],row['geometry'].coords[-1][1])
         
-        if p1 not in pl:
-            pl.append(p1)
-            pfi = len(pl) - 1
-	else:
-            pfi = pl.index(p1)
+            if p1 not in pl:
+                pl.append(p1)
+                pfi = len(pl) - 1
+	    else:
+                pfi = pl.index(p1)
         
-        if p2 not in pl:
-            pl.append(p2)
-            psi = len(pl) - 1        
-        else:
-            psi = pl.index(p2)
+            if p2 not in pl:
+                pl.append(p2)
+                psi = len(pl) - 1        
+            else:
+                psi = pl.index(p2)
 
-        road.at[index, 'psf'] = str(int(pfi))
-        road.at[index, 'pss'] = str(int(psi))    
-        road.at[index, 'pef'] = str(int(psi))
-        road.at[index, 'pes'] = str(int(pfi))            
+            road.at[index, 'psf'] = str(int(pfi))
+            road.at[index, 'pss'] = str(int(psi))    
+            road.at[index, 'pef'] = str(int(psi))
+            road.at[index, 'pes'] = str(int(pfi))            
         
         
-    if len(row['geometry'].coords) > 2:
+        if len(row['geometry'].coords) > 2:
         
-    	p1 = Point(row['geometry'].coords[0][0], row['geometry'].coords[0][1])
-        p2 = Point(row['geometry'].coords[1][0], row['geometry'].coords[1][1])
-        p3 = Point(row['geometry'].coords[-2][0],row['geometry'].coords[-2][1])    
-        p4 = Point(row['geometry'].coords[-1][0],row['geometry'].coords[-1][1])    
+    	    p1 = Point(row['geometry'].coords[0][0], row['geometry'].coords[0][1])
+            p2 = Point(row['geometry'].coords[1][0], row['geometry'].coords[1][1])
+            p3 = Point(row['geometry'].coords[-2][0],row['geometry'].coords[-2][1])    
+            p4 = Point(row['geometry'].coords[-1][0],row['geometry'].coords[-1][1])    
     
-        if p1 not in pl:
-            pl.append(p1)
-            psfi = len(pl) - 1
-        else:
-            psfi = pl.index(p1)
+            if p1 not in pl:
+                pl.append(p1)
+                psfi = len(pl) - 1
+            else:
+                psfi = pl.index(p1)
         
-        if p2 not in pl:
-            pl.append(p2)
-            pssi = len(pl) - 1        
-        else:
-            pssi = pl.index(p2)    
+            if p2 not in pl:
+                pl.append(p2)
+                pssi = len(pl) - 1        
+            else:
+                pssi = pl.index(p2)    
     
-        if p3 not in pl:
-            pl.append(p3)
-            pesi = len(pl) - 1
-        else:
-            pesi = pl.index(p3)
+            if p3 not in pl:
+                pl.append(p3)
+                pesi = len(pl) - 1
+            else:
+                pesi = pl.index(p3)
         
-        if p4 not in pl:
-            pl.append(p4)
-            pefi = len(pl) - 1        
-        else:
-            pefi = pl.index(p4)        
+            if p4 not in pl:
+                pl.append(p4)
+                pefi = len(pl) - 1        
+            else:
+                pefi = pl.index(p4)        
     
-        road.at[index, 'psf'] = str(int(psfi))
-        road.at[index, 'pss'] = str(int(pssi))    
-        road.at[index, 'pef'] = str(int(pefi))
-        road.at[index, 'pes'] = str(int(pesi))
+            road.at[index, 'psf'] = str(int(psfi))
+            road.at[index, 'pss'] = str(int(pssi))    
+            road.at[index, 'pef'] = str(int(pefi))
+            road.at[index, 'pes'] = str(int(pesi))
 
     df = pd.DataFrame()
     df['geometry'] = pl
